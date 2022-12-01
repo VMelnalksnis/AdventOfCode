@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - master
-    pull_requests:
+  pull_request:
+    branches:
       - master
 
 env:
@@ -15,7 +16,7 @@ jobs:
     strategy:
       matrix:
         directory:
-          - "./2022/day-01"
+          - "2022/day-01"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3.1.0
