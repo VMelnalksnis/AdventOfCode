@@ -31,9 +31,9 @@ fn find_n_largest(path: &str, n: usize) -> u32 {
 
 fn get_totals(path: &str) -> Vec<u32> {
     let content = fs::read_to_string(path).expect("foo");
-    let groups: Vec<String> = content
-        .split("\r\n")
-        .map(|x| x.trim().replace("\u{feff}", ""))
+    let groups: Vec<&str> = content
+        .split("\n")
+        .map(|x| x.trim())
         .collect();
 
     let numbers: Vec<Result<u32, core::num::ParseIntError>> =
