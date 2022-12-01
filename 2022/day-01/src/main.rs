@@ -1,9 +1,11 @@
 use std::env;
 use std::fs;
 
+const INPUT_PATH: &str = "input.txt";
+
 fn main() {
     let mut args = env::args().skip(1);
-    let filepath = args.next().unwrap_or("input.txt".to_string());
+    let filepath = args.next().unwrap_or(INPUT_PATH.to_string());
     let count = args
         .next()
         .unwrap_or(3.to_string())
@@ -65,5 +67,17 @@ mod tests {
     fn test_sample_n() {
         let result = find_n_largest(TEST_PATH, 3);
         assert_eq!(result, 45000);
+    }
+
+    #[test]
+    fn test_input() {
+        let result = find_largest(INPUT_PATH);
+        assert_eq!(result, 70116);
+    }
+
+    #[test]
+    fn test_input_n() {
+        let result = find_n_largest(INPUT_PATH, 3);
+        assert_eq!(result, 206582);
     }
 }
