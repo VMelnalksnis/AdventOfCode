@@ -1,0 +1,25 @@
+﻿name: Run tests
+
+on:
+  push:
+    branches:
+      - master
+    pull_requests:
+      - master
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        directory:
+          - "./2022/day-01"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.1.0
+      - run: cargo build
+        working-directory: "${{ matrix.directory }}"
+      - run: cargo test
+        working-directory: "${{ matrix.directory }}"
