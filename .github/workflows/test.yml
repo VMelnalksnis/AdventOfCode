@@ -22,7 +22,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3.1.0
-      - run: cargo build
-        working-directory: "${{ matrix.directory }}"
-      - run: cargo test
+      - uses: dtolnay/rust-toolchain@nightly
+      - run: cargo test -r
         working-directory: "${{ matrix.directory }}"
