@@ -1,6 +1,7 @@
 use core::ops::Range;
 use std::env;
 use std::fs;
+use std::str::FromStr;
 
 const INPUT_PATH: &str = "input.txt";
 
@@ -15,45 +16,57 @@ fn main() {
 }
 
 fn get_contained_pair_count(path: &str) -> usize {
-    get_count(path, &contains)
+    get_count(path, Assignment::contains)
 }
 
 fn get_overlapping_pair_count(path: &str) -> usize {
-    get_count(path, &overlaps)
+    get_count(path, Assignment::overlaps)
 }
 
-fn get_count(path: &str, f: &dyn Fn(&(Range<u32>, Range<u32>)) -> bool) -> usize {
-    let content = fs::read_to_string(path).expect("File should exist");
-    let iter = content
+fn get_count<F>(path: &str, assignment_filter: F) -> usize
+where
+    F: Fn(&Assignment) -> bool,
+{
+    fs::read_to_string(path)
+        .expect("File should exist")
         .split("\n")
-        .map(|x| x.trim())
-        .filter(|x| !x.is_empty())
-        .map(parse_range_pair)
-        .filter(f)
-        .collect::<Vec<(Range<u32>, Range<u32>)>>();
-
-    iter.len()
+        .map(|line| line.trim())
+        .filter(|line| !line.is_empty())
+        .map(|line| line.parse::<Assignment>().expect("valid assignment"))
+        .filter(assignment_filter)
+        .count()
 }
 
-fn contains(ranges: &(Range<u32>, Range<u32>)) -> bool {
-    (ranges.0.start <= ranges.1.start && ranges.0.end >= ranges.1.end)
-        || (ranges.0.start >= ranges.1.start && ranges.0.end <= ranges.1.end)
+struct Assignment {
+    first: Range<u32>,
+    second: Range<u32>,
 }
 
-fn overlaps(ranges: &(Range<u32>, Range<u32>)) -> bool {
-    (ranges.0.end > ranges.1.start && ranges.0.start <= ranges.1.start)
-        || (ranges.1.end > ranges.0.start && ranges.1.start <= ranges.0.start)
-}
-
-fn parse_range_pair(input: &str) -> (Range<u32>, Range<u32>) {
-    let mut iter = input.split(",").map(parse_str_to_range);
-    if let Some(first) = iter.next() {
-        if let Some(second) = iter.next() {
-            return (first, second);
-        }
+impl Assignment {
+    fn contains(&self) -> bool {
+        (self.first.start <= self.second.start && self.first.end >= self.second.end)
+            || (self.first.start >= self.second.start && self.first.end <= self.second.end)
     }
 
-    panic!("Failed to parse {:?}", input);
+    fn overlaps(&self) -> bool {
+        (self.first.end > self.second.start && self.first.start <= self.second.start)
+            || (self.second.end > self.first.start && self.second.start <= self.first.start)
+    }
+}
+
+impl FromStr for Assignment {
+    type Err = ();
+
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        let mut iter = input.split(",").map(parse_str_to_range);
+        if let Some(first) = iter.next() {
+            if let Some(second) = iter.next() {
+                return Ok(Assignment { first, second });
+            }
+        }
+
+        Err(())
+    }
 }
 
 fn parse_str_to_range(input: &str) -> Range<u32> {
