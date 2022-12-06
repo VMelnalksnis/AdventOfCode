@@ -21,6 +21,7 @@ jobs:
           - "2022/day-03"
           - "2022/day-04"
           - "2022/day-05"
+          - "2022/day-06"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3.1.0
